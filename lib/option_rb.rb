@@ -1,4 +1,6 @@
-require "option_rb/version"
+# frozen_string_literal: true
+
+require 'option_rb/version'
 
 module OptionRb
   class Error < StandardError; end

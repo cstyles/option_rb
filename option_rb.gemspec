@@ -25,4 +25,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_development_dependency 'rubocop', '~> 1.8'
+  spec.add_development_dependency 'rubocop-minitest', '~> 0.10.3'
+  spec.add_development_dependency 'rubocop-rake', '~> 0.5.1'
 end

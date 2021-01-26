@@ -310,6 +310,15 @@ class OptionRbTest < Minitest::Test
         assert_equal Some(1), @option.flatten
       end
     end
+
+    context 'replace() ->' do
+      should 'replace the inner value and return the old Option' do
+        old = @option.replace(10)
+
+        assert_equal 10, @option.unwrap
+        assert_equal Some(1), old
+      end
+    end
   end
 
   context 'None:' do
@@ -486,6 +495,15 @@ class OptionRbTest < Minitest::Test
     context 'flatten() ->' do
       should 'return None()' do
         assert @option.flatten.none?
+      end
+    end
+
+    context 'replace() ->' do
+      should 'replace the inner value and return the old Option' do
+        old = @option.replace(10)
+
+        assert_equal 10, @option.unwrap
+        assert old.none?
       end
     end
   end

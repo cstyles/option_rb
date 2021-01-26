@@ -76,6 +76,12 @@ class OptionRbTest < Minitest::Test
         assert_equal 0, result
       end
 
+      should 'raise an error if no block is given' do
+        assert_raises(ArgumentError) do
+          match Some(1)
+        end
+      end
+
       should "raise an error if the match isn't exhaustive" do
         assert_raises(RuntimeError) do
           match Some(1) do

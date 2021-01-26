@@ -250,6 +250,14 @@ class OptionRbTest < Minitest::Test
         refute @option.contains? 0
       end
     end
+
+    context 'flatten() ->' do
+      setup { @option = Some(Some(1)) }
+
+      should 'return the inner Option' do
+        assert_equal Some(1), @option.flatten
+      end
+    end
   end
 
   context 'None:' do
@@ -420,6 +428,12 @@ class OptionRbTest < Minitest::Test
       should 'always return false' do
         refute @option.contains? 1
         refute @option.contains? 0
+      end
+    end
+
+    context 'flatten() ->' do
+      should 'return None()' do
+        assert @option.flatten.none?
       end
     end
   end

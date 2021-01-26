@@ -233,6 +233,16 @@ class OptionRbTest < Minitest::Test
         end
       end
     end
+
+    context 'xor() ->' do
+      should 'return self if the other option is None' do
+        assert_equal @option, @option.xor(None())
+      end
+
+      should 'return None if the other option is Some' do
+        assert_equal None(), @option.xor(Some(2))
+      end
+    end
   end
 
   context 'None:' do
@@ -386,6 +396,16 @@ class OptionRbTest < Minitest::Test
         assert_raises(ArgumentError) do
           @option.or_else
         end
+      end
+    end
+
+    context 'xor() ->' do
+      should 'return None if the other option is None' do
+        assert @option.xor(None()).none?
+      end
+
+      should 'return the other option if it is Some' do
+        assert_equal Some(2), @option.xor(Some(2))
       end
     end
   end

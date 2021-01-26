@@ -344,6 +344,20 @@ class OptionRbTest < Minitest::Test
         assert_equal 'Some(1)', @option.to_s
       end
     end
+
+    context 'equality operator (==) ->' do
+      should 'return false if the other option is None' do
+        refute @option == None()
+      end
+
+      should 'return true if the other option contains the same inner value' do
+        result = @option == Some(1)
+        assert result
+
+        result = @option == Some(2)
+        refute result
+      end
+    end
   end
 
   context 'None:' do
@@ -551,6 +565,18 @@ class OptionRbTest < Minitest::Test
     context 'to_s() -> do' do
       should 'return the variant' do
         assert_equal 'None', @option.to_s
+      end
+    end
+
+    context 'equality operator (==) ->' do
+      should 'return true if the other option is None' do
+        result = @option == None()
+        assert result
+      end
+
+      should 'return false if the other option is None' do
+        result = @option == Some(1)
+        refute result
       end
     end
   end

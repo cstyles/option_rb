@@ -328,6 +328,16 @@ class OptionRbTest < Minitest::Test
         assert Some(1), old
       end
     end
+
+    context 'zip() ->' do
+      should 'return None if the other option is None' do
+        assert @option.zip(None()).none?
+      end
+
+      should 'return a Some with both values if the other option is Some' do
+        assert Some([1, 2]), @option.zip(Some(2))
+      end
+    end
   end
 
   context 'None:' do
@@ -522,6 +532,13 @@ class OptionRbTest < Minitest::Test
 
         assert @option.none?
         assert old.none?
+      end
+    end
+
+    context 'zip() ->' do
+      should 'return None' do
+        assert @option.zip(None()).none?
+        assert @option.zip(Some(2)).none?
       end
     end
   end

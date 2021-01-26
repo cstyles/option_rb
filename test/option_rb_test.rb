@@ -338,6 +338,12 @@ class OptionRbTest < Minitest::Test
         assert Some([1, 2]), @option.zip(Some(2))
       end
     end
+
+    context 'to_s() -> do' do
+      should 'return the variant and the inner value' do
+        assert_equal 'Some(1)', @option.to_s
+      end
+    end
   end
 
   context 'None:' do
@@ -539,6 +545,12 @@ class OptionRbTest < Minitest::Test
       should 'return None' do
         assert @option.zip(None()).none?
         assert @option.zip(Some(2)).none?
+      end
+    end
+
+    context 'to_s() -> do' do
+      should 'return the variant' do
+        assert_equal 'None', @option.to_s
       end
     end
   end

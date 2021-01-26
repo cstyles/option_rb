@@ -319,6 +319,15 @@ class OptionRbTest < Minitest::Test
         assert_equal Some(1), old
       end
     end
+
+    context 'take() ->' do
+      should 'return the option and leave None in its place' do
+        old = @option.take
+
+        assert @option.none?
+        assert Some(1), old
+      end
+    end
   end
 
   context 'None:' do
@@ -503,6 +512,15 @@ class OptionRbTest < Minitest::Test
         old = @option.replace(10)
 
         assert_equal 10, @option.unwrap
+        assert old.none?
+      end
+    end
+
+    context 'take() ->' do
+      should 'return None and leave None in its place' do
+        old = @option.take
+
+        assert @option.none?
         assert old.none?
       end
     end

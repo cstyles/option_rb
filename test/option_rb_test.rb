@@ -243,6 +243,13 @@ class OptionRbTest < Minitest::Test
         assert_equal None(), @option.xor(Some(2))
       end
     end
+
+    context 'contains?() ->' do
+      should 'return if the option contains the given value' do
+        assert @option.contains? 1
+        refute @option.contains? 0
+      end
+    end
   end
 
   context 'None:' do
@@ -406,6 +413,13 @@ class OptionRbTest < Minitest::Test
 
       should 'return the other option if it is Some' do
         assert_equal Some(2), @option.xor(Some(2))
+      end
+    end
+
+    context 'contains?() ->' do
+      should 'always return false' do
+        refute @option.contains? 1
+        refute @option.contains? 0
       end
     end
   end

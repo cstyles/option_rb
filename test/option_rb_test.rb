@@ -195,6 +195,22 @@ class OptionRbTest < Minitest::Test
       end
     end
 
+    context 'filter() ->' do
+      should 'return self if the predicate returns true' do
+        assert_equal Some(1), @option.filter(&:odd?)
+      end
+
+      should 'return None if the predicate returns false' do
+        assert_equal None(), @option.filter(&:even?)
+      end
+
+      should 'raise an error if no block is given' do
+        assert_raises(ArgumentError) do
+          @option.filter
+        end
+      end
+    end
+
     context 'or() ->' do
       should 'return the other option if it is Some' do
         assert_equal Some(1), @option.or(Some(2))
@@ -323,6 +339,19 @@ class OptionRbTest < Minitest::Test
       should 'raise an error if no block is given' do
         assert_raises(ArgumentError) do
           @option.and_then
+        end
+      end
+    end
+
+    context 'filter() ->' do
+      should 'always return None' do
+        assert_equal None(), @option.filter(&:odd?)
+        assert_equal None(), @option.filter(&:even?)
+      end
+
+      should 'raise an error if no block is given' do
+        assert_raises(ArgumentError) do
+          @option.filter
         end
       end
     end

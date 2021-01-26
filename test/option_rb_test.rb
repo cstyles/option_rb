@@ -220,6 +220,19 @@ class OptionRbTest < Minitest::Test
         assert_equal Some(1), @option.or(None())
       end
     end
+
+    context 'or_else() ->' do
+      should 'return self' do
+        result = @option.or_else { Some(11) }
+        assert_equal @option, result
+      end
+
+      should 'raise an error if no block is given' do
+        assert_raises(ArgumentError) do
+          @option.or_else
+        end
+      end
+    end
   end
 
   context 'None:' do
@@ -360,6 +373,19 @@ class OptionRbTest < Minitest::Test
       should 'always return the other option' do
         assert_equal Some(2), @option.or(Some(2))
         assert @option.or(None()).none?
+      end
+    end
+
+    context 'or_else() ->' do
+      should 'return the value returned by the block argument' do
+        result = @option.or_else { Some(11) }
+        assert_equal Some(11), result
+      end
+
+      should 'raise an error if no block is given' do
+        assert_raises(ArgumentError) do
+          @option.or_else
+        end
       end
     end
   end

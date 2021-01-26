@@ -75,6 +75,24 @@ class OptionRbTest < Minitest::Test
 
         assert_equal 0, result
       end
+
+      should 'raise an error if Some or None is specified more than once' do
+        assert_raises(RuntimeError) do
+          match Some(1) do
+            Some { |value| value + 1 }
+            Some { |value| value + 1 }
+            None { 0 }
+          end
+        end
+
+        assert_raises(RuntimeError) do
+          match Some(1) do
+            Some { |value| value + 1 }
+            None { 0 }
+            None { 0 }
+          end
+        end
+      end
     end
   end
 

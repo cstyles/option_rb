@@ -5,3 +5,12 @@ AllCops:
 require:
   - rubocop-minitest
   - rubocop-rake
+
+Layout/LineLength:
+  Max: 100
+
+Metrics/MethodLength:
+  Max: 25
+
+Style/EmptyElse:
+  EnforcedStyle: empty

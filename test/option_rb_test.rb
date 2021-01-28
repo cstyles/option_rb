@@ -311,6 +311,19 @@ class OptionRbTest < Minitest::Test
       end
     end
 
+    context 'get_or_insert_with() ->' do
+      should 'return the inner value' do
+        result = @option.get_or_insert_with { 0 }
+        assert 1, result
+      end
+
+      should 'raise an error if no block is given' do
+        assert_raises(ArgumentError) do
+          @option.get_or_insert_with
+        end
+      end
+    end
+
     context 'replace() ->' do
       should 'replace the inner value and return the old Option' do
         old = @option.replace(10)
@@ -534,6 +547,24 @@ class OptionRbTest < Minitest::Test
     context 'flatten() ->' do
       should 'return None()' do
         assert @option.flatten.none?
+      end
+    end
+
+    context 'get_or_insert_with() ->' do
+      should 'set the inner value to the value returned by the block' do
+        @option.get_or_insert_with { 0 }
+        assert_equal Some(0), @option
+      end
+
+      should 'return the new inner value' do
+        result = @option.get_or_insert_with { 0 }
+        assert_equal 0, result
+      end
+
+      should 'raise an error if no block is given' do
+        assert_raises(ArgumentError) do
+          @option.get_or_insert_with
+        end
       end
     end
 

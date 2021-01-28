@@ -174,7 +174,7 @@ module OptionRb
     end
 
     def get_or_insert_with # rubocop:disable Naming/AccessorMethodName
-      return ArgumentError, 'no block given' unless block_given?
+      raise ArgumentError, 'no block given' unless block_given?
 
       if some?
         @value

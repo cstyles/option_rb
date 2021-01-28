@@ -170,7 +170,12 @@ module OptionRb
     end
 
     def get_or_insert(new_value)
-      get_or_insert_with { new_value }
+      if some?
+        @value
+      else
+        @variant = :some
+        @value = new_value
+      end
     end
 
     def get_or_insert_with # rubocop:disable Naming/AccessorMethodName

@@ -311,6 +311,12 @@ class OptionRbTest < Minitest::Test
       end
     end
 
+    context 'get_or_insert() ->' do
+      should 'return the inner value' do
+        assert_equal 1, @option.get_or_insert(0)
+      end
+    end
+
     context 'get_or_insert_with() ->' do
       should 'return the inner value' do
         result = @option.get_or_insert_with { 0 }
@@ -547,6 +553,17 @@ class OptionRbTest < Minitest::Test
     context 'flatten() ->' do
       should 'return None()' do
         assert @option.flatten.none?
+      end
+    end
+
+    context 'get_or_insert() ->' do
+      should 'set the inner value to the argument' do
+        @option.get_or_insert(0)
+        assert_equal Some(0), @option
+      end
+
+      should 'return the new inner value' do
+        assert_equal 0, @option.get_or_insert(0)
       end
     end
 

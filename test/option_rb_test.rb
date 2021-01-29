@@ -358,7 +358,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'to_s() -> do' do
+    context 'to_s() ->' do
       should 'return the variant and the inner value' do
         assert_equal 'Some(1)', @option.to_s
       end
@@ -610,7 +610,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'to_s() -> do' do
+    context 'to_s() ->' do
       should 'return the variant' do
         assert_equal 'None', @option.to_s
       end

@@ -5,11 +5,11 @@ require 'option_rb'
 # Define some constructors for `Option`s
 module OptionRb
   def Some(value) # rubocop:disable Naming/MethodName
-    Option.some(value)
+    Some.new(value)
   end
 
   def None # rubocop:disable Naming/MethodName
-    Option.none
+    None.new
   end
 end
 

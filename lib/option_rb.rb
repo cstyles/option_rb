@@ -2,12 +2,7 @@
 
 module OptionRb
   # A class representing an optional value
-  class Option # rubocop:disable Metrics/ClassLength
-    def initialize(variant, value = nil)
-      @variant = variant
-      @value = value
-    end
-
+  class Option
     # Hide `new` to force users to go through the approved constructors
     private_class_method :new
 
@@ -20,250 +15,11 @@ module OptionRb
     end
 
     def self.some(value)
-      new(:some, value)
+      Some.new(value)
     end
 
     def self.none
-      new(:none)
-    end
-
-    def some?
-      @variant == :some
-    end
-
-    def none?
-      @variant == :none
-    end
-
-    def unwrap
-      return @value if some?
-
-      raise UnwrapError
-    end
-
-    def expect(message)
-      return @value if some?
-
-      raise UnwrapError, message
-    end
-
-    def unwrap_or(default)
-      if some?
-        @value
-      else
-        default
-      end
-    end
-
-    def unwrap_or_else
-      raise ArgumentError, 'no block given' unless block_given?
-
-      if some?
-        @value
-      else
-        yield
-      end
-    end
-
-    def map
-      raise ArgumentError, 'no block given' unless block_given?
-
-      if some?
-        Option.some(yield @value)
-      else
-        self
-      end
-    end
-
-    def map_or(default)
-      raise ArgumentError, 'no block given' unless block_given?
-
-      if some?
-        yield @value
-      else
-        default
-      end
-    end
-
-    def map_or_else(default_proc, map_proc)
-      if some?
-        map_proc.call(@value)
-      else
-        default_proc.call
-      end
-    end
-
-    def and(other_option)
-      if some?
-        other_option
-      else
-        self
-      end
-    end
-
-    def and_then
-      raise ArgumentError, 'no block given' unless block_given?
-
-      if some?
-        yield @value
-      else
-        self
-      end
-    end
-
-    def filter
-      raise ArgumentError, 'no block given' unless block_given?
-
-      if some? && yield(@value)
-        self
-      else
-        Option.none
-      end
-    end
-
-    def or(other_option)
-      if some?
-        self
-      else
-        other_option
-      end
-    end
-
-    def or_else
-      raise ArgumentError, 'no block given' unless block_given?
-
-      if some?
-        self
-      else
-        yield
-      end
-    end
-
-    def xor(other_option)
-      if some?
-        if other_option.some?
-          Option.none
-        else
-          self
-        end
-      elsif other_option.some?
-        other_option
-      else
-        self # None
-      end
-    end
-
-    def contains?(value)
-      if some?
-        @value == value
-      else
-        false
-      end
-    end
-
-    def flatten
-      if some?
-        @value
-      else
-        self
-      end
-    end
-
-    def get_or_insert(new_value)
-      if some?
-        @value
-      else
-        @variant = :some
-        @value = new_value
-      end
-    end
-
-    def get_or_insert_with # rubocop:disable Naming/AccessorMethodName
-      raise ArgumentError, 'no block given' unless block_given?
-
-      if some?
-        @value
-      else
-        @variant = :some
-        @value = yield
-      end
-    end
-
-    # iter
-    def to_enum
-      # Create a new object so that the Enumerator doesn't touch the original
-      #
-      # NOTE: `dup` does a shallow copy so if the user of the Enumerator modifies
-      # the internal value during iteration, it will affect the original Option.
-      # For example:
-      #
-      # ```ruby
-      # > option = Some('hi')
-      # > enumerator = option.to_enum
-      # > enumerator.first.map(&:upcase!)
-      # ```
-      #
-      # The final expression will return a Some('HI') which will be a different
-      # object than the original `option`. However, the original `option` will
-      # now also be `Some('HI')`.
-      option = dup
-
-      Enumerator.new do |yielder|
-        loop do
-          yielder << option.take
-        end
-      end
-    end
-
-    def replace(new_value)
-      old = dup
-      @variant = :some
-      @value = new_value
-
-      old
-    end
-
-    def take
-      old = dup
-      @variant = :none
-      @value = nil
-
-      old
-    end
-
-    def zip(other_option)
-      if some? && other_option.some?
-        Option.some([@value, other_option.value])
-      else
-        Option.none
-      end
-    end
-
-    # Kinda implements the `Debug` trait
-    def to_s
-      if some?
-        "Some(#{@value})"
-      else
-        'None'
-      end
-    end
-
-    # Converts an Option back into "Ruby-land" (where `None` is `nil`)
-    # TODO: downcast?
-    def to_ruby
-      @value
-    end
-
-    def ==(other)
-      if some?
-        if other.some?
-          @value == other.value
-        else
-          false
-        end
-      else
-        other.none?
-      end
+      None.new
     end
 
     def match(exhaustive: true, &block)
@@ -290,14 +46,18 @@ module OptionRb
 
     attr_reader :value
 
+    def initialize(value = nil); end
+
     private
 
+    # For use inside a match block
     def Some(&block) # rubocop:disable Naming/MethodName
       raise '`Some` already specified!' unless @some_proc.nil?
 
       @some_proc = block
     end
 
+    # For use inside a match block
     def None(&block) # rubocop:disable Naming/MethodName
       raise '`None` already specified!' unless @none_proc.nil?
 
@@ -316,15 +76,6 @@ module OptionRb
 
       raise error_message
     end
-
-    # Evaluates the appropriae match arm in the original contextt
-    def evaluate_match(context)
-      if some? && !@some_proc.nil?
-        context.instance_exec(@value, &@some_proc)
-      elsif !@none_proc.nil?
-        context.instance_exec(&@none_proc)
-      end
-    end
   end
 
   # An error that is raised when a None value is unwrapped
@@ -333,6 +84,238 @@ module OptionRb
 
     def initialize(message = DEFAULT_MESSAGE)
       super(message)
+    end
+  end
+
+  # The variant of Option expressing the presence of some data
+  class Some < Option
+    # Re-expose `new` so users can instantiate this Class (but not Option)
+    public_class_method :new
+
+    def initialize(value)
+      @value = value
+      super value
+    end
+
+    def some?
+      true
+    end
+
+    def none?
+      false
+    end
+
+    def unwrap
+      @value
+    end
+
+    def expect(_message)
+      @value
+    end
+
+    def unwrap_or(_default)
+      @value
+    end
+
+    def unwrap_or_else
+      raise ArgumentError, 'no block given' unless block_given?
+
+      @value
+    end
+
+    def map
+      raise ArgumentError, 'no block given' unless block_given?
+
+      Option.some(yield @value)
+    end
+
+    def map_or(_default)
+      raise ArgumentError, 'no block given' unless block_given?
+
+      yield @value
+    end
+
+    def map_or_else(_default_proc, map_proc)
+      map_proc.call(@value)
+    end
+
+    def and(other_option)
+      other_option
+    end
+
+    def and_then
+      raise ArgumentError, 'no block given' unless block_given?
+
+      yield @value
+    end
+
+    def filter
+      raise ArgumentError, 'no block given' unless block_given?
+
+      if yield(@value)
+        self
+      else
+        Option.none
+      end
+    end
+
+    def or(_other_option)
+      self
+    end
+
+    def or_else
+      raise ArgumentError, 'no block given' unless block_given?
+
+      self
+    end
+
+    def xor(other_option)
+      if other_option.some?
+        Option.none
+      else
+        self
+      end
+    end
+
+    def contains?(value)
+      @value == value
+    end
+
+    def flatten
+      @value
+    end
+
+    def zip(other_option)
+      if other_option.some?
+        # TODO: won't work because value is protected? or will it?
+        Option.some([@value, other_option.value])
+      else
+        Option.none
+      end
+    end
+
+    def to_s
+      "Some(#{@value})"
+    end
+
+    def ==(other)
+      if other.some?
+        @value == other.value
+      else
+        false
+      end
+    end
+
+    # Evaluates the appropriae match arm in the original contextt
+    def evaluate_match(context)
+      context.instance_exec(@value, &@some_proc) unless @some_proc.nil?
+    end
+  end
+
+  # The variant of Option expressing the absence of data
+  class None < Option
+    # Re-expose `new` so users can instantiate this Class (but not Option)
+    public_class_method :new
+
+    def some?
+      false
+    end
+
+    def none?
+      true
+    end
+
+    def unwrap
+      raise UnwrapError
+    end
+
+    def expect(message)
+      raise UnwrapError, message
+    end
+
+    def unwrap_or(default)
+      default
+    end
+
+    def unwrap_or_else
+      raise ArgumentError, 'no block given' unless block_given?
+
+      yield
+    end
+
+    def map
+      raise ArgumentError, 'no block given' unless block_given?
+
+      self
+    end
+
+    def map_or(default)
+      raise ArgumentError, 'no block given' unless block_given?
+
+      default
+    end
+
+    def map_or_else(default_proc, _map_proc)
+      default_proc.call
+    end
+
+    def and(_other_option)
+      self
+    end
+
+    def and_then
+      raise ArgumentError, 'no block given' unless block_given?
+
+      self
+    end
+
+    def filter
+      raise ArgumentError, 'no block given' unless block_given?
+
+      Option.none
+    end
+
+    def or(other_option)
+      other_option
+    end
+
+    def or_else
+      raise ArgumentError, 'no block given' unless block_given?
+
+      yield
+    end
+
+    def xor(other_option)
+      if other_option.some?
+        other_option
+      else
+        self
+      end
+    end
+
+    def contains?(_value)
+      false
+    end
+
+    def flatten
+      self
+    end
+
+    def zip(_other_option)
+      Option.none
+    end
+
+    def to_s
+      'None'
+    end
+
+    def ==(other)
+      other.none?
+    end
+
+    # Evaluates the appropriae match arm in the original contextt
+    def evaluate_match(context)
+      context.instance_exec(&@none_proc) unless @none_proc.nil?
     end
   end
 end

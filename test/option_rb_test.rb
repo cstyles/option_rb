@@ -311,43 +311,6 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'get_or_insert() ->' do
-      should 'return the inner value' do
-        assert_equal 1, @option.get_or_insert(0)
-      end
-    end
-
-    context 'get_or_insert_with() ->' do
-      should 'return the inner value' do
-        result = @option.get_or_insert_with { 0 }
-        assert 1, result
-      end
-
-      should 'raise an error if no block is given' do
-        assert_raises(ArgumentError) do
-          @option.get_or_insert_with
-        end
-      end
-    end
-
-    context 'replace() ->' do
-      should 'replace the inner value and return the old Option' do
-        old = @option.replace(10)
-
-        assert_equal 10, @option.unwrap
-        assert_equal Some(1), old
-      end
-    end
-
-    context 'take() ->' do
-      should 'return the option and leave None in its place' do
-        old = @option.take
-
-        assert @option.none?
-        assert Some(1), old
-      end
-    end
-
     context 'zip() ->' do
       should 'return None if the other option is None' do
         assert @option.zip(None()).none?
@@ -553,53 +516,6 @@ class OptionRbTest < Minitest::Test
     context 'flatten() ->' do
       should 'return None()' do
         assert @option.flatten.none?
-      end
-    end
-
-    context 'get_or_insert() ->' do
-      should 'set the inner value to the argument' do
-        @option.get_or_insert(0)
-        assert_equal Some(0), @option
-      end
-
-      should 'return the new inner value' do
-        assert_equal 0, @option.get_or_insert(0)
-      end
-    end
-
-    context 'get_or_insert_with() ->' do
-      should 'set the inner value to the value returned by the block' do
-        @option.get_or_insert_with { 0 }
-        assert_equal Some(0), @option
-      end
-
-      should 'return the new inner value' do
-        result = @option.get_or_insert_with { 0 }
-        assert_equal 0, result
-      end
-
-      should 'raise an error if no block is given' do
-        assert_raises(ArgumentError) do
-          @option.get_or_insert_with
-        end
-      end
-    end
-
-    context 'replace() ->' do
-      should 'replace the inner value and return the old Option' do
-        old = @option.replace(10)
-
-        assert_equal 10, @option.unwrap
-        assert old.none?
-      end
-    end
-
-    context 'take() ->' do
-      should 'return None and leave None in its place' do
-        old = @option.take
-
-        assert @option.none?
-        assert old.none?
       end
     end
 

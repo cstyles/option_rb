@@ -9,6 +9,8 @@ require 'test_helper'
 # not just from the block
 
 class OptionRbTest < Minitest::Test
+  include OptionRb
+
   context 'class methods ->' do
     context 'some() ->' do
       should 'return a Some wrapping some value' do
@@ -39,100 +41,83 @@ class OptionRbTest < Minitest::Test
     end
   end
 
-  context 'helper methods / syntactic sugar ->' do
-    context 'Some() ->' do
-      should 'return a Some wrapping some value' do
-        some = Some(2)
+  context 'match() ->' do
+    should 'work just like Option#match' do
+      option = Option.some(1)
 
-        assert some.some?
-        assert_equal 2, some.unwrap
+      result = option.match do
+        Some { |value| value + 10 }
+        None { 0 }
+      end
+
+      assert_equal 11, result
+
+      option = Option.none
+
+      result = option.match do
+        Some { |value| value + 10 }
+        None { 0 }
+      end
+
+      assert_equal 0, result
+    end
+
+    should 'raise an error if no block is given' do
+      assert_raises(ArgumentError) do
+        Option.some(1).match
       end
     end
 
-    context 'None() ->' do
-      should 'return a None' do
-        assert None().none?
-      end
-    end
-
-    context 'match() ->' do
-      should 'work just like Option#match' do
-        option = Some(1)
-
-        result = match option do
-          Some { |value| value + 10 }
-          None { 0 }
-        end
-
-        assert_equal 11, result
-
-        option = None()
-
-        result = match option do
-          Some { |value| value + 10 }
-          None { 0 }
-        end
-
-        assert_equal 0, result
-      end
-
-      should 'raise an error if no block is given' do
-        assert_raises(ArgumentError) do
-          match Some(1)
-        end
-      end
-
-      should "raise an error if the match isn't exhaustive" do
-        assert_raises(RuntimeError) do
-          match Some(1) do
-            Some { |value| value + 1 }
-          end
-        end
-
-        assert_raises(RuntimeError) do
-          match Some(1) do
-            None { 0 }
-          end
-        end
-      end
-
-      should 'raise an error if Some or None is specified more than once' do
-        assert_raises(RuntimeError) do
-          match Some(1) do
-            Some { |value| value + 1 }
-            Some { |value| value + 1 }
-            None { 0 }
-          end
-        end
-
-        assert_raises(RuntimeError) do
-          match Some(1) do
-            Some { |value| value + 1 }
-            None { 0 }
-            None { 0 }
-          end
-        end
-      end
-    end
-
-    context 'lmatch() ->' do
-      should "not raise an error if the match isn't exhaustive" do
-        lmatch Some(1) do
+    should "raise an error if the match isn't exhaustive" do
+      assert_raises(RuntimeError) do
+        Option.some(1).match do
           Some { |value| value + 1 }
         end
+      end
 
-        lmatch Some(1) do
+      assert_raises(RuntimeError) do
+        Option.some(1).match do
           None { 0 }
         end
-
-        lmatch(Some(1)) { nil }
       end
+    end
+
+    should 'raise an error if Some or None is specified more than once' do
+      assert_raises(RuntimeError) do
+        Option.some(1).match do
+          Some { |value| value + 1 }
+          Some { |value| value + 1 }
+          None { 0 }
+        end
+      end
+
+      assert_raises(RuntimeError) do
+        Option.some(1).match do
+          Some { |value| value + 1 }
+          None { 0 }
+          None { 0 }
+        end
+      end
+    end
+  end
+
+  context 'lmatch() ->' do
+    should "not raise an error if the match isn't exhaustive" do
+      Option.some(1).lmatch do
+        Some { |value| value + 1 }
+      end
+
+      Option.some(1).lmatch do
+        None { 0 }
+      end
+
+      Option.some(1).lmatch { nil }
     end
   end
 
   context 'Some ->' do
     setup do
-      @option = Some(1)
+      @option = Option.some(1)
     end
 
     context 'match() ->' do
@@ -191,7 +176,7 @@ class OptionRbTest < Minitest::Test
     context 'map() ->' do
       should 'return a new Some containing the value returned by the block' do
         result = @option.map { |value| value + 10 }
-        assert_equal Some(11), result
+        assert_equal Option.some(11), result
       end
 
       should 'raise an error if no block is given' do
@@ -223,21 +208,21 @@ class OptionRbTest < Minitest::Test
 
     context 'and() ->' do
       should 'return the second option if it is Some' do
-        assert_equal Some(2), @option.and(Some(2))
+        assert_equal Option.some(2), @option.and(Option.some(2))
       end
 
       should 'return None if the second option is None' do
-        assert_equal None(), @option.and(None())
+        assert_equal Option.none, @option.and(Option.none)
       end
     end
 
     context 'and_then() ->' do
       should 'call the function with the wrapped value and return the result' do
-        result = @option.and_then { |value| Some(value + 10) }
-        assert_equal Some(11), result
+        result = @option.and_then { |value| Option.some(value + 10) }
+        assert_equal Option.some(11), result
 
-        result = @option.and_then { None() }
-        assert_equal None(), result
+        result = @option.and_then { Option.none }
+        assert_equal Option.none, result
       end
 
       should 'raise an error if no block is given' do
@@ -249,11 +234,11 @@ class OptionRbTest < Minitest::Test
 
     context 'filter() ->' do
       should 'return self if the predicate returns true' do
-        assert_equal Some(1), @option.filter(&:odd?)
+        assert_equal Option.some(1), @option.filter(&:odd?)
       end
 
       should 'return None if the predicate returns false' do
-        assert_equal None(), @option.filter(&:even?)
+        assert_equal Option.none, @option.filter(&:even?)
       end
 
       should 'raise an error if no block is given' do
@@ -265,17 +250,17 @@ class OptionRbTest < Minitest::Test
 
     context 'or() ->' do
       should 'return the other option if it is Some' do
-        assert_equal Some(1), @option.or(Some(2))
+        assert_equal Option.some(1), @option.or(Option.some(2))
       end
 
       should 'return self if the other option is None' do
-        assert_equal Some(1), @option.or(None())
+        assert_equal Option.some(1), @option.or(Option.none)
       end
     end
 
     context 'or_else() ->' do
       should 'return self' do
-        result = @option.or_else { Some(11) }
+        result = @option.or_else { Option.some(11) }
         assert_equal @option, result
       end
 
@@ -288,11 +273,11 @@ class OptionRbTest < Minitest::Test
 
     context 'xor() ->' do
       should 'return self if the other option is None' do
-        assert_equal @option, @option.xor(None())
+        assert_equal @option, @option.xor(Option.none)
       end
 
       should 'return None if the other option is Some' do
-        assert_equal None(), @option.xor(Some(2))
+        assert_equal Option.none, @option.xor(Option.some(2))
       end
     end
 
@@ -304,20 +289,20 @@ class OptionRbTest < Minitest::Test
     end
 
     context 'flatten() ->' do
-      setup { @option = Some(Some(1)) }
+      setup { @option = Option.some(Option.some(1)) }
 
       should 'return the inner Option' do
-        assert_equal Some(1), @option.flatten
+        assert_equal Option.some(1), @option.flatten
       end
     end
 
     context 'zip() ->' do
       should 'return None if the other option is None' do
-        assert @option.zip(None()).none?
+        assert @option.zip(Option.none).none?
       end
 
       should 'return a Some with both values if the other option is Some' do
-        assert Some([1, 2]), @option.zip(Some(2))
+        assert Option.some([1, 2]), @option.zip(Option.some(2))
       end
     end
 
@@ -329,14 +314,14 @@ class OptionRbTest < Minitest::Test
 
     context 'equality operator (==) ->' do
       should 'return false if the other option is None' do
-        refute @option == None()
+        refute @option == Option.none
       end
 
       should 'return true if the other option contains the same inner value' do
-        result = @option == Some(1)
+        result = @option == Option.some(1)
         assert result
 
-        result = @option == Some(2)
+        result = @option == Option.some(2)
         refute result
       end
     end
@@ -344,7 +329,7 @@ class OptionRbTest < Minitest::Test
 
   context 'None:' do
     setup do
-      @option = None()
+      @option = Option.none
     end
 
     context 'match() ->' do
@@ -372,15 +357,15 @@ class OptionRbTest < Minitest::Test
 
     context 'unwrap() ->' do
       should 'raise an error' do
-        assert_raises(Option::UnwrapError) { @option.unwrap }
+        assert_raises(UnwrapError) { @option.unwrap }
       end
     end
 
     context 'expect() ->' do
       should 'raise an error with the custom error message' do
-        assert_raises(Option::UnwrapError) do
+        assert_raises(UnwrapError) do
           @option.expect('custom error message')
-        rescue Option::UnwrapError => e
+        rescue UnwrapError => e
           assert_equal 'custom error message', e.message
           raise e
         end
@@ -445,15 +430,15 @@ class OptionRbTest < Minitest::Test
 
     context 'and() ->' do
       should 'always return None' do
-        assert @option.and(Some(2)).none?
-        assert @option.and(None()).none?
+        assert @option.and(Option.some(2)).none?
+        assert @option.and(Option.none).none?
       end
     end
 
     context 'and_then() ->' do
       should 'always return None' do
-        assert @option.and_then { |value| Some(value + 10) }.none?
-        assert @option.and_then { None() }.none?
+        assert @option.and_then { |value| Option.some(value + 10) }.none?
+        assert @option.and_then { Option.none }.none?
       end
 
       should 'raise an error if no block is given' do
@@ -465,8 +450,8 @@ class OptionRbTest < Minitest::Test
 
     context 'filter() ->' do
       should 'always return None' do
-        assert_equal None(), @option.filter(&:odd?)
-        assert_equal None(), @option.filter(&:even?)
+        assert_equal Option.none, @option.filter(&:odd?)
+        assert_equal Option.none, @option.filter(&:even?)
       end
 
       should 'raise an error if no block is given' do
@@ -478,15 +463,15 @@ class OptionRbTest < Minitest::Test
 
     context 'or() ->' do
       should 'always return the other option' do
-        assert_equal Some(2), @option.or(Some(2))
-        assert @option.or(None()).none?
+        assert_equal Option.some(2), @option.or(Option.some(2))
+        assert @option.or(Option.none).none?
       end
     end
 
     context 'or_else() ->' do
       should 'return the value returned by the block argument' do
-        result = @option.or_else { Some(11) }
-        assert_equal Some(11), result
+        result = @option.or_else { Option.some(11) }
+        assert_equal Option.some(11), result
       end
 
       should 'raise an error if no block is given' do
@@ -498,11 +483,11 @@ class OptionRbTest < Minitest::Test
 
     context 'xor() ->' do
       should 'return None if the other option is None' do
-        assert @option.xor(None()).none?
+        assert @option.xor(Option.none).none?
       end
 
       should 'return the other option if it is Some' do
-        assert_equal Some(2), @option.xor(Some(2))
+        assert_equal Option.some(2), @option.xor(Option.some(2))
       end
     end
 
@@ -521,8 +506,8 @@ class OptionRbTest < Minitest::Test
 
     context 'zip() ->' do
       should 'return None' do
-        assert @option.zip(None()).none?
-        assert @option.zip(Some(2)).none?
+        assert @option.zip(Option.none).none?
+        assert @option.zip(Option.some(2)).none?
       end
     end
 
@@ -534,12 +519,12 @@ class OptionRbTest < Minitest::Test
 
     context 'equality operator (==) ->' do
       should 'return true if the other option is None' do
-        result = @option == None()
+        result = @option == Option.none
         assert result
       end
 
       should 'return false if the other option is None' do
-        result = @option == Some(1)
+        result = @option == Option.some(1)
         refute result
       end
     end

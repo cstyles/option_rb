@@ -10,7 +10,8 @@ if ENV['MEASURE_COVERAGE']
 end
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
-require 'option_rb/prelude'
+
+require 'option_rb'
 
 require 'minitest/autorun'
 require 'minitest/reporters'

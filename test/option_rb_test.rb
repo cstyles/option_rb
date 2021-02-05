@@ -42,6 +42,19 @@ class OptionRbTest < Minitest::Test
   end
 
   context '#match' do
+    setup { @instance_variable = 1 }
+
+    should 'have access to variables in the original context' do
+      local_variable = 2
+
+      result = Option.some(3).match do
+        Some { |value| value + @instance_variable + local_variable }
+        None { 0 }
+      end
+
+      assert_equal 6, result
+    end
+
     should 'raise an error if no block is given' do
       assert_raises(ArgumentError) do
         Option.some(1).match

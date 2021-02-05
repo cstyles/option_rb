@@ -182,7 +182,6 @@ module OptionRb
 
     def zip(other_option)
       if other_option.some?
-        # TODO: won't work because value is protected? or will it?
         Option.some([@value, other_option.value])
       else
         Option.none

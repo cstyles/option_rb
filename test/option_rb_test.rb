@@ -2,12 +2,6 @@
 
 require 'test_helper'
 
-# TODO: to_s / to_str
-# TODO: ==
-# TODO:
-# a test that we use Procs and that we return from where the closure is defined,
-# not just from the block
-
 class OptionRbTest < Minitest::Test
   include OptionRb
 

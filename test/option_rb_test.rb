@@ -42,26 +42,6 @@ class OptionRbTest < Minitest::Test
   end
 
   context 'match() ->' do
-    should 'work just like Option#match' do
-      option = Option.some(1)
-
-      result = option.match do
-        Some { |value| value + 10 }
-        None { 0 }
-      end
-
-      assert_equal 11, result
-
-      option = Option.none
-
-      result = option.match do
-        Some { |value| value + 10 }
-        None { 0 }
-      end
-
-      assert_equal 0, result
-    end
-
     should 'raise an error if no block is given' do
       assert_raises(ArgumentError) do
         Option.some(1).match

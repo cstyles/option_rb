@@ -12,7 +12,7 @@ class OptionRbTest < Minitest::Test
   include OptionRb
 
   context 'class methods ->' do
-    context 'some() ->' do
+    context '::some' do
       should 'return a Some wrapping some value' do
         some = Option.some(2)
 
@@ -21,13 +21,13 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'none() ->' do
+    context '::none' do
       should 'return a None' do
         assert Option.none.none?
       end
     end
 
-    context 'from() ->' do
+    context '::from' do
       should "return a Some wrapping the argument if it's not nil" do
         from = Option.from(2)
 
@@ -41,7 +41,7 @@ class OptionRbTest < Minitest::Test
     end
   end
 
-  context 'match() ->' do
+  context '#match' do
     should 'raise an error if no block is given' do
       assert_raises(ArgumentError) do
         Option.some(1).match
@@ -81,7 +81,7 @@ class OptionRbTest < Minitest::Test
     end
   end
 
-  context 'lmatch() ->' do
+  context '#lmatch' do
     should "not raise an error if the match isn't exhaustive" do
       Option.some(1).lmatch do
         Some { |value| value + 1 }
@@ -95,12 +95,12 @@ class OptionRbTest < Minitest::Test
     end
   end
 
-  context 'Some ->' do
+  context 'Some' do
     setup do
       @option = Option.some(1)
     end
 
-    context 'match() ->' do
+    context '#match' do
       should 'return the value returned by the Some arm' do
         result = @option.match do
           Some { |value| value + 10 }
@@ -111,37 +111,37 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'some? ->' do
+    context '#some?' do
       should 'return true' do
         assert @option.some?
       end
     end
 
-    context 'none? ->' do
+    context '#none?' do
       should 'return false' do
         refute @option.none?
       end
     end
 
-    context 'unwrap() ->' do
+    context '#unwrap' do
       should 'return the inner value' do
         assert_equal 1, @option.unwrap
       end
     end
 
-    context 'expect() ->' do
+    context '#expect' do
       should 'return the inner value' do
         assert_equal 1, @option.expect('custom error message')
       end
     end
 
-    context 'unwrap_or() ->' do
+    context '#unwrap_or' do
       should 'return the inner value' do
         assert_equal 1, @option.unwrap_or('default')
       end
     end
 
-    context 'unwrap_or_else() ->' do
+    context '#unwrap_or_else' do
       should 'return the inner value' do
         assert_equal(1, @option.unwrap_or_else { 'default' })
       end
@@ -153,7 +153,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'map() ->' do
+    context '#map' do
       should 'return a new Some containing the value returned by the block' do
         result = @option.map { |value| value + 10 }
         assert_equal Option.some(11), result
@@ -166,7 +166,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'map_or() ->' do
+    context '#map_or' do
       should 'return the value returned by the block' do
         result = @option.map_or('default') { |value| value + 10 }
         assert_equal 11, result
@@ -179,14 +179,14 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'map_or_else() ->' do
+    context '#map_or_else' do
       should 'return the value returned by the second argument' do
         result = @option.map_or_else(-> { 'default' }, ->(value) { value + 10 })
         assert_equal 11, result
       end
     end
 
-    context 'and() ->' do
+    context '#and' do
       should 'return the second option if it is Some' do
         assert_equal Option.some(2), @option.and(Option.some(2))
       end
@@ -196,7 +196,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'and_then() ->' do
+    context '#and_then' do
       should 'call the function with the wrapped value and return the result' do
         result = @option.and_then { |value| Option.some(value + 10) }
         assert_equal Option.some(11), result
@@ -212,7 +212,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'filter() ->' do
+    context '#filter' do
       should 'return self if the predicate returns true' do
         assert_equal Option.some(1), @option.filter(&:odd?)
       end
@@ -228,7 +228,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'or() ->' do
+    context '#or' do
       should 'return the other option if it is Some' do
         assert_equal Option.some(1), @option.or(Option.some(2))
       end
@@ -238,7 +238,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'or_else() ->' do
+    context '#or_else' do
       should 'return self' do
         result = @option.or_else { Option.some(11) }
         assert_equal @option, result
@@ -251,7 +251,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'xor() ->' do
+    context '#xor' do
       should 'return self if the other option is None' do
         assert_equal @option, @option.xor(Option.none)
       end
@@ -261,14 +261,14 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'contains?() ->' do
+    context '#contains?' do
       should 'return if the option contains the given value' do
         assert @option.contains? 1
         refute @option.contains? 0
       end
     end
 
-    context 'flatten() ->' do
+    context '#flatten' do
       setup { @option = Option.some(Option.some(1)) }
 
       should 'return the inner Option' do
@@ -276,7 +276,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'zip() ->' do
+    context '#zip' do
       should 'return None if the other option is None' do
         assert @option.zip(Option.none).none?
       end
@@ -286,13 +286,13 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'to_s() ->' do
+    context '#to_s' do
       should 'return the variant and the inner value' do
         assert_equal 'Some(1)', @option.to_s
       end
     end
 
-    context 'equality operator (==) ->' do
+    context '#==' do
       should 'return false if the other option is None' do
         refute @option == Option.none
       end
@@ -307,12 +307,12 @@ class OptionRbTest < Minitest::Test
     end
   end
 
-  context 'None:' do
+  context 'None' do
     setup do
       @option = Option.none
     end
 
-    context 'match() ->' do
+    context '#match' do
       should 'return the value returned by the None arm' do
         result = @option.match do
           Some { |value| value + 10 }
@@ -323,25 +323,25 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'some? ->' do
+    context '#some?' do
       should 'return false' do
         refute @option.some?
       end
     end
 
-    context 'none? ->' do
+    context '#none?' do
       should 'return true' do
         assert @option.none?
       end
     end
 
-    context 'unwrap() ->' do
+    context '#unwrap' do
       should 'raise an error' do
         assert_raises(UnwrapError) { @option.unwrap }
       end
     end
 
-    context 'expect() ->' do
+    context '#expect' do
       should 'raise an error with the custom error message' do
         assert_raises(UnwrapError) do
           @option.expect('custom error message')
@@ -352,13 +352,13 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'unwrap_or() ->' do
+    context '#unwrap_or' do
       should 'return the default value' do
         assert_equal 'default', @option.unwrap_or('default')
       end
     end
 
-    context 'unwrap_or_else() ->' do
+    context '#unwrap_or_else' do
       should 'return the value returned by the block that was passed' do
         assert_equal('default', @option.unwrap_or_else { 'default' })
       end
@@ -370,7 +370,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'map() ->' do
+    context '#map' do
       should 'return None' do
         mapped = @option.map { |value| value + 10 }
 
@@ -384,7 +384,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'map_or() ->' do
+    context '#map_or' do
       should 'return the default value' do
         result = @option.map_or('default') { |value| value + 10 }
         assert_equal 'default', result
@@ -397,7 +397,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'map_or_else() ->' do
+    context '#map_or_else' do
       should 'return the value returned by the first argument' do
         result = @option.map_or_else(
           -> { 'default' },
@@ -408,14 +408,14 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'and() ->' do
+    context '#and' do
       should 'always return None' do
         assert @option.and(Option.some(2)).none?
         assert @option.and(Option.none).none?
       end
     end
 
-    context 'and_then() ->' do
+    context '#and_then' do
       should 'always return None' do
         assert @option.and_then { |value| Option.some(value + 10) }.none?
         assert @option.and_then { Option.none }.none?
@@ -428,7 +428,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'filter() ->' do
+    context '#filter' do
       should 'always return None' do
         assert_equal Option.none, @option.filter(&:odd?)
         assert_equal Option.none, @option.filter(&:even?)
@@ -441,14 +441,14 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'or() ->' do
+    context '#or' do
       should 'always return the other option' do
         assert_equal Option.some(2), @option.or(Option.some(2))
         assert @option.or(Option.none).none?
       end
     end
 
-    context 'or_else() ->' do
+    context '#or_else' do
       should 'return the value returned by the block argument' do
         result = @option.or_else { Option.some(11) }
         assert_equal Option.some(11), result
@@ -461,7 +461,7 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'xor() ->' do
+    context '#xor' do
       should 'return None if the other option is None' do
         assert @option.xor(Option.none).none?
       end
@@ -471,33 +471,33 @@ class OptionRbTest < Minitest::Test
       end
     end
 
-    context 'contains?() ->' do
+    context '#contains?' do
       should 'always return false' do
         refute @option.contains? 1
         refute @option.contains? 0
       end
     end
 
-    context 'flatten() ->' do
+    context '#flatten' do
       should 'return None()' do
         assert @option.flatten.none?
       end
     end
 
-    context 'zip() ->' do
+    context '#zip' do
       should 'return None' do
         assert @option.zip(Option.none).none?
         assert @option.zip(Option.some(2)).none?
       end
     end
 
-    context 'to_s() ->' do
+    context '#to_s' do
       should 'return the variant' do
         assert_equal 'None', @option.to_s
       end
     end
 
-    context 'equality operator (==) ->' do
+    context '#==' do
       should 'return true if the other option is None' do
         result = @option == Option.none
         assert result

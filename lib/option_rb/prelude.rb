@@ -14,7 +14,7 @@ module OptionRb
 end
 
 # Export the `Option` class and its constructors into the global namespace
-include OptionRb
+include OptionRb # rubocop:disable Style/MixinUsage
 
 def match(option, &block)
   option.match(&block)

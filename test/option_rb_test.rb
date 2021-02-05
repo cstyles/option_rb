@@ -6,6 +6,16 @@ class OptionRbTest < Minitest::Test
   include OptionRb
 
   context 'class methods ->' do
+    context '::new' do
+      should 'be private' do
+        Option.new
+      rescue NoMethodError => e
+        assert_match(/private method `new' called/, e.message)
+      else
+        assert false, 'Expected `NoMethodError` but no exception was raised'
+      end
+    end
+
     context '::some' do
       should 'return a Some wrapping some value' do
         some = Option.some(2)

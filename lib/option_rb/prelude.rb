@@ -19,8 +19,3 @@ include OptionRb # rubocop:disable Style/MixinUsage
 def match(option, &block)
   option.match(&block)
 end
-
-# "Loose" match (non-exhaustive)
-def lmatch(option, &block)
-  option.lmatch(&block)
-end

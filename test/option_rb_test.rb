@@ -81,20 +81,6 @@ class OptionRbTest < Minitest::Test
     end
   end
 
-  context '#lmatch' do
-    should "not raise an error if the match isn't exhaustive" do
-      Option.some(1).lmatch do
-        Some { |value| value + 1 }
-      end
-
-      Option.some(1).lmatch do
-        None { 0 }
-      end
-
-      Option.some(1).lmatch { nil }
-    end
-  end
-
   context 'Some' do
     setup do
       @option = Option.some(1)

@@ -37,11 +37,6 @@ module OptionRb
       evaluate_match(block.binding.receiver)
     end
 
-    # "Loose" match (non-exhaustive)
-    def lmatch(&block)
-      match(exhaustive: false, &block)
-    end
-
     protected
 
     attr_reader :value

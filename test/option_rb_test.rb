@@ -295,6 +295,12 @@ class OptionRbTest < Minitest::Test
       end
     end
 
+    context '#inspect' do
+      should 'return the variant and the inner value' do
+        assert_equal 'Some(1)', @option.inspect
+      end
+    end
+
     context '#==' do
       should 'return false if the other option is None' do
         refute @option == Option.none
@@ -497,6 +503,12 @@ class OptionRbTest < Minitest::Test
     context '#to_s' do
       should 'return the variant' do
         assert_equal 'None', @option.to_s
+      end
+    end
+
+    context '#inspect' do
+      should 'return the variant' do
+        assert_equal 'None', @option.inspect
       end
     end
 

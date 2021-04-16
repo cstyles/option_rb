@@ -192,6 +192,10 @@ module OptionRb
       "Some(#{@value})"
     end
 
+    def inspect
+      "Some(#{@value.inspect})"
+    end
+
     def ==(other)
       if other.some?
         @value == other.value
@@ -300,6 +304,10 @@ module OptionRb
     end
 
     def to_s
+      'None'
+    end
+
+    def inspect
       'None'
     end
 

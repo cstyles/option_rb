@@ -285,7 +285,7 @@ class OptionRbTest < Minitest::Test
       end
 
       should 'return a Some with both values if the other option is Some' do
-        assert Option.some([1, 2]), @option.zip(Option.some(2))
+        assert_equal Option.some([1, 2]), @option.zip(Option.some(2))
       end
     end
 

@@ -200,6 +200,12 @@ module OptionRb
       other.contains? @value
     end
 
+    def q?
+      raise ArgumentError, 'no block given' unless block_given?
+
+      @value
+    end
+
     # Evaluates the appropriate match arm in the original context
     def evaluate_match(context)
       context.instance_exec(@value, &@some_proc) unless @some_proc.nil?
@@ -305,6 +311,10 @@ module OptionRb
 
     def ==(other)
       other.none?
+    end
+
+    def q?(&block)
+      block.binding.eval('proc { return ::OptionRb::Option.none }').call
     end
 
     # Evaluates the appropriate match arm in the original context

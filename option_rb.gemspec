@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.summary       = "A port of Rust's `Option` type to Ruby."
   spec.description   = spec.summary
   spec.homepage      = 'https://github.com/mycase/option_rb'
-  spec.required_ruby_version = Gem::Requirement.new('>= 2.5.0')
+  spec.required_ruby_version = Gem::Requirement.new('>= 2.6.0')
 
   spec.metadata['homepage_uri'] = spec.homepage
   spec.metadata['source_code_uri'] = spec.homepage

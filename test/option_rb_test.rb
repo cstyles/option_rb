@@ -8,11 +8,8 @@ class OptionRbTest < Minitest::Test
   context 'class methods ->' do
     context '::new' do
       should 'be private' do
-        Option.new
-      rescue NoMethodError => e
-        assert_match(/private method `new' called/, e.message)
-      else
-        assert false, 'Expected `NoMethodError` but no exception was raised'
+        exception = assert_raises(NoMethodError) { Option.new }
+        assert_match(/private method `new' called/, exception.message)
       end
     end
 

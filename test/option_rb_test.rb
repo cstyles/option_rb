@@ -93,6 +93,32 @@ class OptionRbTest < Minitest::Test
         end
       end
     end
+
+    should 'allow non-exhaustive matching' do
+      result = Option.some(1).match(exhaustive: false) do
+        Some { |value| value + 1 }
+      end
+
+      assert_equal 2, result
+
+      result = Option.some(1).match(exhaustive: false) do
+        None { 5 }
+      end
+
+      assert_nil result
+
+      result = Option.none.match(exhaustive: false) do
+        None { 5 }
+      end
+
+      assert_equal 5, result
+
+      result = Option.none.match(exhaustive: false) do
+        Some { |value| value + 1 }
+      end
+
+      assert_nil result
+    end
   end
 
   context 'Some' do

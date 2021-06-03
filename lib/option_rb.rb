@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'binding_of_caller'
+
 module OptionRb
   # A class representing an optional value
   class Option
@@ -201,8 +203,6 @@ module OptionRb
     end
 
     def q?
-      raise ArgumentError, 'no block given' unless block_given?
-
       @value
     end
 
@@ -313,8 +313,8 @@ module OptionRb
       other.none?
     end
 
-    def q?(&block)
-      block.binding.eval('proc { return ::OptionRb::Option.none }').call
+    def q?
+      binding.of_caller(1).eval('proc { return ::OptionRb::Option.none }').call
     end
 
     # Evaluates the appropriate match arm in the original context

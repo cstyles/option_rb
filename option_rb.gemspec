@@ -24,6 +24,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+  spec.add_dependency 'binding_of_caller', '~> 1.0'
+
   spec.add_development_dependency 'minitest', '~> 5.0'
   spec.add_development_dependency 'minitest-reporters', '~> 1.4'
   spec.add_development_dependency 'mocha', '~> 1.11'

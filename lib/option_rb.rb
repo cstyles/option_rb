@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'binding_of_caller'
+require 'binding_ninja'
 
 module OptionRb
   # A class representing an optional value
@@ -214,6 +214,8 @@ module OptionRb
 
   # The variant of Option expressing the absence of data
   class None < Option
+    extend BindingNinja
+
     # Re-expose `new` so users can instantiate this Class (but not Option)
     public_class_method :new
 
@@ -313,9 +315,10 @@ module OptionRb
       other.none?
     end
 
-    def q?
-      binding.of_caller(1).eval('proc { return ::OptionRb::Option.none }').call
+    def q?(binding_of_caller)
+      binding_of_caller.eval('proc { return ::OptionRb::Option.none }').call
     end
+    auto_inject_binding :q?
 
     # Evaluates the appropriate match arm in the original context
     def evaluate_match(context)

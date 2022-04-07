@@ -197,11 +197,7 @@ module OptionRb
     end
 
     def ==(other)
-      if other.some?
-        @value == other.value
-      else
-        false
-      end
+      other.contains? @value
     end
 
     # Evaluates the appropriate match arm in the original context

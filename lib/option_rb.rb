@@ -280,11 +280,7 @@ module OptionRb
     end
 
     def xor(other_option)
-      if other_option.some?
-        other_option
-      else
-        self
-      end
+      other_option
     end
 
     def contains?(_value)

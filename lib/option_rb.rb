@@ -204,7 +204,7 @@ module OptionRb
       end
     end
 
-    # Evaluates the appropriae match arm in the original contextt
+    # Evaluates the appropriate match arm in the original context
     def evaluate_match(context)
       context.instance_exec(@value, &@some_proc) unless @some_proc.nil?
     end
@@ -315,7 +315,7 @@ module OptionRb
       other.none?
     end
 
-    # Evaluates the appropriae match arm in the original contextt
+    # Evaluates the appropriate match arm in the original context
     def evaluate_match(context)
       context.instance_exec(&@none_proc) unless @none_proc.nil?
     end

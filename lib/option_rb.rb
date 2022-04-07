@@ -270,7 +270,7 @@ module OptionRb
     def filter
       raise ArgumentError, 'no block given' unless block_given?
 
-      Option.none
+      self
     end
 
     def or(other_option)
@@ -300,7 +300,7 @@ module OptionRb
     end
 
     def zip(_other_option)
-      Option.none
+      self
     end
 
     def to_s
